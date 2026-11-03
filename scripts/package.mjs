@@ -5,7 +5,15 @@ import { fileURLToPath } from 'node:url';
 import { rcedit } from 'rcedit';
 import { ensureElectron } from './ensure-electron.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
-const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+const gitOutput = (args) => {
+  const result = spawnSync('git', args, { cwd: root, encoding: 'utf8', windowsHide: true });
+  if (result.status !== 0) throw new Error('读取 Git 快照失败，请先提交源码。');
+  return result.stdout.trim();
+};
+const sourceCommit = gitOutput(['rev-parse', 'HEAD']);
+if (gitOutput(['status', '--porcelain', '--untracked-files=no'])) {
+  throw new Error('已跟踪源码存在未提交改动，请先提交再打包。');
+}
 await ensureElectron();
 const command = (file, args, cwd = root, env = process.env) =>
   new Promise((resolve, reject) => {
@@ -13,12 +21,19 @@ const command = (file, args, cwd = root, env = process.env) =>
     child.on('error', reject);
     child.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`命令退出码 ${code}`))));
   });
-await command(process.execPath, [
-  path.join(root, 'node_modules', 'vite', 'bin', 'vite.js'),
-  'build',
-]);
 const outputRoot = path.join(root, 'release');
 fs.mkdirSync(outputRoot, { recursive: true });
+const source = path.join(outputRoot, `.source-${sourceCommit.slice(0, 12)}-${Date.now()}`);
+fs.mkdirSync(source, { recursive: true });
+const sourceTar = source + '.tar';
+await command('git', ['archive', '--format=tar', `--output=${sourceTar}`, sourceCommit]);
+await command('tar.exe', ['-xf', sourceTar, '-C', source]);
+const pkg = JSON.parse(fs.readFileSync(path.join(source, 'package.json'), 'utf8'));
+await command(
+  process.execPath,
+  [path.join(root, 'node_modules', 'vite', 'bin', 'vite.js'), 'build'],
+  source,
+);
 let output = path.join(outputRoot, `AgentStudio-Windows-v${pkg.version}`);
 if (fs.existsSync(output)) output += '-ready';
 if (fs.existsSync(output)) output += '-' + Date.now();
@@ -36,15 +51,15 @@ await rcedit(path.join(output, 'Agent Studio.exe'), {
   },
   'file-version': pkg.version,
   'product-version': pkg.version,
-  icon: path.join(root, 'electron', 'icon.ico'),
+  icon: path.join(source, 'electron', 'icon.ico'),
   'requested-execution-level': 'asInvoker',
 });
 const app = path.join(output, 'resources', 'app');
 fs.mkdirSync(app, { recursive: true });
 for (const folder of ['dist', 'server', 'electron'])
-  fs.cpSync(path.join(root, folder), path.join(app, folder), { recursive: true });
+  fs.cpSync(path.join(source, folder), path.join(app, folder), { recursive: true });
 for (const file of ['package.json', 'package-lock.json', 'LICENSE'])
-  fs.copyFileSync(path.join(root, file), path.join(app, file));
+  fs.copyFileSync(path.join(source, file), path.join(app, file));
 const npm =
   process.env.npm_execpath ||
   path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
@@ -61,19 +76,15 @@ await command(
   app,
   installEnv,
 );
-fs.copyFileSync(path.join(root, 'README.md'), path.join(output, '使用说明.md'));
-fs.cpSync(path.join(root, 'docs'), path.join(output, 'docs'), { recursive: true });
-const gitOutput = (args) => {
-  const r = spawnSync('git', args, { cwd: root, encoding: 'utf8', windowsHide: true });
-  return r.status === 0 ? r.stdout.trim() : null;
-};
+fs.copyFileSync(path.join(source, 'README.md'), path.join(output, '使用说明.md'));
+fs.cpSync(path.join(source, 'docs'), path.join(output, 'docs'), { recursive: true });
 fs.writeFileSync(
   path.join(output, 'build-info.json'),
   JSON.stringify(
     {
       version: pkg.version,
-      sourceCommit: gitOutput(['rev-parse', 'HEAD']),
-      sourceDirty: !!gitOutput(['status', '--porcelain']),
+      sourceCommit,
+      sourceDirty: false,
       builtAt: new Date().toISOString(),
       platform: process.platform,
       arch: process.arch,

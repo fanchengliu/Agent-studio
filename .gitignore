@@ -14,3 +14,4 @@ artifacts/
 *.key
 workspace.json
 workspace.json.tmp
+docs/references/

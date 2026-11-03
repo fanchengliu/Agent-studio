@@ -25,6 +25,8 @@ npm run test:package
 
 `build-info.json` 记录源 commit、是否存在未提交改动和构建环境。正式发布前确认 `sourceDirty` 为 `false`。
 
+打包器从固定 commit 的 `git archive` 创建隔离源码目录，再构建和复制应用。未提交的参考资料不会进入发行包；已跟踪源码有未提交改动时会拒绝打包。`docs/references/` 保留为本地参考资料目录，不随 Git 提交或发行。
+
 ## 基线发布物
 
 - 完整包：Windows 成品目录、源码 ZIP、Git bundle、说明与校验清单。
