@@ -1,0 +1,16 @@
+node_modules/
+dist/
+release/
+.studio-data/
+test-results/
+*.log
+.env*
+!.env.example
+.cache/
+artifacts/
+*.zip
+*.bundle
+*.pem
+*.key
+workspace.json
+workspace.json.tmp

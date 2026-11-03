@@ -1,0 +1,56 @@
+{
+  "name": "agent-studio",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Local desktop workspace for real multi-provider agent collaboration",
+  "type": "module",
+  "main": "electron/main.mjs",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "vite build",
+    "start": "electron .",
+    "web": "node server/index.mjs",
+    "test": "node --test --test-concurrency=1 tests/*.test.mjs",
+    "test:ui": "node scripts/ui-check.mjs",
+    "package": "node scripts/package.mjs",
+    "dist:win": "node scripts/package.mjs",
+    "setup:runtime": "node scripts/ensure-electron.mjs",
+    "check": "node scripts/check-source.mjs",
+    "verify": "npm run check && npm run build && npm test",
+    "test:canvas": "node scripts/design-check.mjs",
+    "test:package": "node scripts/check-package.mjs",
+    "format": "prettier --write \"src/**/*.{js,jsx,css}\" \"server/**/*.mjs\" \"electron/**/*.mjs\" \"scripts/**/*.mjs\" \"tests/**/*.mjs\" \"docs/**/*.md\" \"*.{json,md,mjs}\" \".github/**/*.yml\""
+  },
+  "dependencies": {
+    "@lydell/node-pty": "1.1.0",
+    "@xterm/addon-fit": "0.11.0",
+    "@xterm/xterm": "6.0.0",
+    "@xyflow/react": "12.12.1",
+    "express": "5.3.0",
+    "lucide-react": "1.66.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-markdown": "10.1.0",
+    "remark-gfm": "4.0.1",
+    "ws": "8.22.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@vitejs/plugin-react": "6.2.1",
+    "electron": "45.2.1",
+    "prettier": "3.9.10",
+    "rcedit": "5.0.2",
+    "vite": "8.3.5"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fanchengliu/Agent-studio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fanchengliu/Agent-studio/issues"
+  }
+}

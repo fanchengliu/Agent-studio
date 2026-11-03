@@ -1,0 +1,49 @@
+{
+  "version": "0.2.0",
+  "status": "baseline-prerelease",
+  "checkedAtUtc": "2026-11-03T06:57:55.502Z",
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "node": "v24.18.0",
+    "electron": "45.2.1"
+  },
+  "syntax": "passed",
+  "productionBuild": "passed",
+  "coreTests": {
+    "passed": 22,
+    "failed": 0
+  },
+  "canvasChecks": [
+    "六成员紧凑画布",
+    "侧栏收起与展开",
+    "紧凑与详情视图切换",
+    "缩放百分比与适应画布",
+    "布局整理、撤销和重做",
+    "右键菜单与位置锁定",
+    "角色库持久化",
+    "视图书签保存",
+    "独立账号目录（不登录、不调用模型）",
+    "日历排期保存且默认关闭",
+    "本地文件附件"
+  ],
+  "desktopChecks": [
+    "本地入口与首次启动界面",
+    "创建三节点团队与共享便签",
+    "节点角色编辑与持久化",
+    "完整团队流程与上游输出传递（测试进程）",
+    "任务列表与会话回看",
+    "多 Provider 连接配置",
+    "定时任务默认关闭",
+    "Windows 桌面窗口与真实工具检测",
+    "Windows ConPTY 交互终端启动与输入",
+    "桌面真实子进程 → 权限对话框 → 结果回传（测试协议）",
+    "桌面浏览器快照、真实点击与截图"
+  ],
+  "browserErrors": [],
+  "productionDependencyAudit": {
+    "knownVulnerabilities": 0
+  },
+  "realModelCalls": 0,
+  "packageCheck": "See release validation.json for the post-commit package check"
+}
